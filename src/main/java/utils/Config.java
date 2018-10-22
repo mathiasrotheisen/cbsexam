@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+// Malthe lugter godt
 public final class Config {
 
   private static String DATABASE_HOST;

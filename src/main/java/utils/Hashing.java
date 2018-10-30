@@ -38,7 +38,14 @@ public final class Hashing {
   }
 
   // TODO: You should add a salt and make this secure
+  public static String shaWithSalt (String str) {
+    String salt = "suh234uihn423i";
+    String hashedPassword = str + salt;
+    return sha(hashedPassword);
+  }
+
   public static String sha(String rawString) {
+
     try {
       // We load the hashing algoritm we wish to use.
       MessageDigest digest = MessageDigest.getInstance("SHA-256");

@@ -2,12 +2,13 @@ package utils;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import sun.security.krb5.EncryptionKey;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-// Malthe lugter godt
 public final class Config {
 
   private static String DATABASE_HOST;
@@ -16,6 +17,7 @@ public final class Config {
   private static String DATABASE_PASSWORD;
   private static String DATABASE_NAME;
   private static boolean ENCRYPTION;
+  private static String ENCRYPTIONKEY;
   private static String SOLR_HOST;
   private static int SOLR_PORT;
   private static String SOLR_PATH;
@@ -48,6 +50,10 @@ public final class Config {
 
   public static Boolean getEncryption() {
     return ENCRYPTION;
+  }
+
+  public static char[] getEncryptionKey() {
+    return ENCRYPTIONKEY.toCharArray();
   }
 
   public static String getSolrHost() {
@@ -100,5 +106,7 @@ public final class Config {
     SOLR_PATH = json.get("SOLR_PATH").toString().replace("\"", "");
     SOLR_CORE = json.get("SOLR_CORE").toString().replace("\"", "");
     PRODUCT_TTL = json.get("PRODUCT_TTL").getAsLong();
+    ENCRYPTIONKEY = json.get("ENCRYPTIONKEY").getAsString();
+
   }
 }

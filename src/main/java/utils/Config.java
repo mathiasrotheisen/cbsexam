@@ -2,7 +2,6 @@ package utils;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import sun.security.krb5.EncryptionKey;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,10 +21,10 @@ public final class Config {
   private static int SOLR_PORT;
   private static String SOLR_PATH;
   private static String SOLR_CORE;
-  private static long PRODUCT_TTL;
+  private static long CACHE_TTL;
 
-  public static long getProductTtl() {
-    return PRODUCT_TTL;
+  public static long getCacheTtl() {
+    return CACHE_TTL;
   }
 
   public static String getDatabaseHost() {
@@ -105,7 +104,7 @@ public final class Config {
     SOLR_PORT = Integer.parseInt(json.get("SOLR_PORT").toString().replace("\"", ""));
     SOLR_PATH = json.get("SOLR_PATH").toString().replace("\"", "");
     SOLR_CORE = json.get("SOLR_CORE").toString().replace("\"", "");
-    PRODUCT_TTL = json.get("PRODUCT_TTL").getAsLong();
+    CACHE_TTL = json.get("CACHE_TTL").getAsLong();
     ENCRYPTIONKEY = json.get("ENCRYPTIONKEY").getAsString();
 
   }

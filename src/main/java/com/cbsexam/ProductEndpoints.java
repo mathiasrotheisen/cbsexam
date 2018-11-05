@@ -1,5 +1,6 @@
 package com.cbsexam;
 
+import cache.ProductCache;
 import com.google.gson.Gson;
 import controllers.ProductController;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import utils.Encryption;
 @Path("product")
 public class ProductEndpoints {
 
+  private static ProductCache productCache = new ProductCache();
   /**
    * @param idProduct
    * @return Responses
@@ -44,7 +46,7 @@ public class ProductEndpoints {
   public Response getProducts() {
 
     // Call our controller-layer in order to get the order from the DB
-    ArrayList<Product> products = ProductController.getProducts();
+    ArrayList<Product> products = productCache.getProducts(false);
 
     // TODO: Add Encryption to JSON : FIXED
     // We convert the java object to json with GSON library imported in Maven
@@ -68,6 +70,9 @@ public class ProductEndpoints {
     // Use the controller to add the user
     Product createdProduct = ProductController.createProduct(newProduct);
 
+    // Forcing update on the cache since the Array has been updated
+    productCache.getProducts(true);
+
     // Get the user back with the added ID and return it to the user
     String json = new Gson().toJson(createdProduct);
 
@@ -76,7 +81,7 @@ public class ProductEndpoints {
       // Return a response with status 200 and JSON as type
       return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
     } else {
-      return Response.status(400).entity("Could not create user").build();
+      return Response.status(400).entity("Could not create product").build();
     }
   }
 }

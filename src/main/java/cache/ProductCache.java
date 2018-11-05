@@ -17,23 +17,23 @@ public class ProductCache {
   private long created;
 
   public ProductCache() {
-    this.ttl = Config.getProductTtl();
+    this.ttl = Config.getCacheTtl();
   }
 
   public ArrayList<Product> getProducts(Boolean forceUpdate) {
 
-    // If we whis to clear cache, we can set force update.
+    // If we wish to clear cache, we can set force update.
     // Otherwise we look at the age of the cache and figure out if we should update.
     // If the list is empty we also check for new products
     if (forceUpdate
-        || ((this.created + this.ttl) >= (System.currentTimeMillis() / 1000L))
-        || this.products.isEmpty()) {
+        || ((this.created + this.ttl) <= (System.currentTimeMillis() / 1000L))
+        || this.products == null) {
 
       // Get products from controller, since we wish to update.
-      ArrayList<Product> products = ProductController.getProducts();
+      ArrayList<Product> cacheProducts = ProductController.getProducts();
 
       // Set products for the instance and set created timestamp
-      this.products = products;
+      this.products = cacheProducts;
       this.created = System.currentTimeMillis() / 1000L;
     }
 

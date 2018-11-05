@@ -38,7 +38,8 @@ public class ProductController {
                 rs.getString("sku"),
                 rs.getFloat("price"),
                 rs.getString("description"),
-                rs.getInt("stock"));
+                rs.getInt("stock"),
+                rs.getLong("creaeted_at"));
 
         // Return the product
         return product;
@@ -73,7 +74,8 @@ public class ProductController {
                 rs.getString("sku"),
                 rs.getFloat("price"),
                 rs.getString("description"),
-                rs.getInt("stock"));
+                rs.getInt("stock"),
+                rs.getLong("created_at"));
 
         return product;
       } else {
@@ -97,7 +99,7 @@ public class ProductController {
       dbCon = new DatabaseController();
     }
 
-    // TODO: Use caching layer.
+    // TODO: Use caching layer: FIXED but misplaced. Kig på det senere Mathias.
     String sql = "SELECT * FROM product";
 
     ResultSet rs = dbCon.query(sql);
@@ -108,11 +110,12 @@ public class ProductController {
         Product product =
             new Product(
                 rs.getInt("id"),
-                rs.getString("name"),
+                rs.getString("product_name"),
                 rs.getString("sku"),
                 rs.getFloat("price"),
                 rs.getString("description"),
-                rs.getInt("stock"));
+                rs.getInt("stock"),
+                rs.getLong("created_at"));
 
         products.add(product);
       }
@@ -148,7 +151,7 @@ public class ProductController {
             + product.getDescription()
             + "', "
             + product.getStock()
-            + "', "
+            + ", "
             + product.getCreatedTime()
             + ")");
 

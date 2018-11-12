@@ -4,11 +4,7 @@ import cache.UserCache;
 import com.google.gson.Gson;
 import controllers.UserController;
 import java.util.ArrayList;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -80,6 +76,9 @@ public class UserEndpoints {
     // Get the user back with the added ID and return it to the user
     String json = new Gson().toJson(createUser);
 
+    // Updates the cache
+    userCache.getUsers(true);
+
     // Return the data to the user
     if (createUser != null) {
       // Return a response with status 200 and JSON as type
@@ -93,17 +92,40 @@ public class UserEndpoints {
   @POST
   @Path("/login")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response loginUser(String x) {
+  public Response loginUser(String loginInfo) {
 
-    // Return a response with status 200 and JSON as type
+    User loginUser = new Gson().fromJson(loginInfo, User.class);
+
+    User databaseUser = UserController.getUserByEmail(loginUser.getEmail());
+
+    String json = new Gson().toJson(databaseUser);
+
+    if (loginUser.getEmail().equals(databaseUser.getEmail()) && loginUser.getPassword().equals(databaseUser.getPassword())) {
+      // Return a response with status 200 and JSON as type
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+    }
     return Response.status(400).entity("Endpoint not implemented yet").build();
+
   }
+  @DELETE
+  @Path("/delete/{idUser}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  // TODO: Make the system able to delete users: FIXED
+  public Response deleteUser( @PathParam("idUser") int id) {
 
-  // TODO: Make the system able to delete users
-  public Response deleteUser(String x) {
+    //Method for deleting the user
+    boolean successfulUserDeleted = UserController.delete(id);
 
-    // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+
+
+    // Updates the cache
+    userCache.getUsers(true);
+
+    if (successfulUserDeleted){
+      // Return a response with status 200 and JSON as type
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("Deleted the user with id " + id).build();
+    }
+    return Response.status(400).entity("There was a problem deleting the user").build();
   }
 
   // TODO: Make the system able to update users

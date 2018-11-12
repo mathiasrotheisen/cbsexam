@@ -1,12 +1,7 @@
 package cache;
 
-import controllers.OrderController;
-import controllers.ProductController;
 import java.util.ArrayList;
-
 import controllers.UserController;
-import model.Order;
-import model.Product;
 import model.User;
 import utils.Config;
 
@@ -35,10 +30,8 @@ public class UserCache {
                 || this.users == null) {
 
             // Get products from controller, since we wish to update.
-            ArrayList<User> cacheUsers = UserController.getUsers();
-
             // Set products for the instance and set created timestamp
-            this.users = cacheUsers;
+            this.users = UserController.getUsers();
             this.created = System.currentTimeMillis() / 1000L;
         }
 

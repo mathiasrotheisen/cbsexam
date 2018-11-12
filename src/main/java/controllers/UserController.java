@@ -110,7 +110,7 @@ public class UserController {
     }
 
     // Insert the user in the DB
-    // TODO: Hash the user password before saving it.
+    // TODO: Hash the user password before saving it : FIXED
     int userID = dbCon.insert(
         "INSERT INTO user(first_name, last_name, password, email, created_at) VALUES('"
             + user.getFirstname()
@@ -133,6 +133,59 @@ public class UserController {
     }
 
     // Return user
+    return user;
+  }
+
+  public static boolean delete(int id) {
+    Log.writeLog(UserController.class.getName(), id, "deleting a user in the Database", 0);
+
+    if (dbCon == null) {
+      dbCon = new DatabaseController();
+    }
+
+    // Check of the user exists
+    User user = UserController.getUser(id);
+
+    // Returns true if the user exists and the user is deleted from the database
+    return user != null && dbCon.deleteUpdate("DELETE FROM user WHERE id =" + id);
+  }
+
+
+  public static User getUserByEmail(String email) {
+
+    // Check for connection
+    if (dbCon == null) {
+      dbCon = new DatabaseController();
+    }
+
+    // Build the query for DB
+    String sql = "SELECT * FROM user where email='" + email + "'";
+
+    // Actually do the query
+    ResultSet rs = dbCon.query(sql);
+    User user = null;
+
+    try {
+      // Get first object, since we only have one
+      if (rs.next()) {
+        user =
+                new User(
+                        rs.getInt("id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("password"),
+                        rs.getString("email"),
+                        rs.getLong("created_at"));
+        // return the create object
+        return user;
+      } else {
+        System.out.println("No User found");
+      }
+    } catch (SQLException ex) {
+      System.out.println(ex.getMessage());
+    }
+
+    // Return null
     return user;
   }
 }

@@ -1,11 +1,8 @@
 package cache;
 
 import controllers.OrderController;
-import controllers.ProductController;
 import java.util.ArrayList;
-
 import model.Order;
-import model.Product;
 import utils.Config;
 
 public class OrderCache {
@@ -33,10 +30,8 @@ public class OrderCache {
                 || this.orders == null) {
 
             // Get products from controller, since we wish to update.
-            ArrayList<Order> cacheOrders = OrderController.getOrders();
-
             // Set products for the instance and set created timestamp
-            this.orders = cacheOrders;
+            this.orders = OrderController.getOrders();
             this.created = System.currentTimeMillis() / 1000L;
         }
 

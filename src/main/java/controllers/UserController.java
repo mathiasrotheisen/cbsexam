@@ -3,6 +3,10 @@ package controllers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
 import model.User;
 import utils.Hashing;
 import utils.Log;
@@ -168,8 +172,10 @@ public class UserController {
     try {
       // Get first object, since we only have one
       if (rs.next()) {
-        user =
-                new User(
+
+
+
+          user = new User(
                         rs.getInt("id"),
                         rs.getString("first_name"),
                         rs.getString("last_name"),
@@ -177,6 +183,11 @@ public class UserController {
                         rs.getString("email"),
                         rs.getLong("created_at"));
         // return the create object
+
+        Algorithm algorithm = Algorithm.HMAC256("cbsexam");
+        String token = JWT.create().withClaim("userId", user.getId()).sign(algorithm);
+        user.setToken(token);
+
         return user;
       } else {
         System.out.println("No User found");

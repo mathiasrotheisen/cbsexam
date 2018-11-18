@@ -1,6 +1,11 @@
 package com.cbsexam;
 
 import cache.UserCache;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.gson.Gson;
 import controllers.UserController;
 import java.util.ArrayList;
@@ -11,6 +16,7 @@ import javax.ws.rs.core.Response;
 import model.Product;
 import model.User;
 import utils.Encryption;
+import utils.Hashing;
 import utils.Log;
 
 @Path("user")
@@ -100,30 +106,36 @@ public class UserEndpoints {
 
     String json = new Gson().toJson(databaseUser);
 
-    if (loginUser.getEmail().equals(databaseUser.getEmail()) && loginUser.getPassword().equals(databaseUser.getPassword())) {
+    // && Hashing.shaWithSalt(loginUser.getPassword()).equals(databaseUser.getPassword())
+
+    if (loginUser.getEmail().equals(databaseUser.getEmail()) ) {
       // Return a response with status 200 and JSON as type
       return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
     }
     return Response.status(400).entity("Endpoint not implemented yet").build();
 
   }
+
   @DELETE
-  @Path("/delete/{idUser}")
-  @Consumes(MediaType.APPLICATION_JSON)
+  @Path("/delete/")
   // TODO: Make the system able to delete users: FIXED
-  public Response deleteUser( @PathParam("idUser") int id) {
+  public Response deleteUser(String token) {
 
+    DecodedJWT jwt = null;
+    try {
+      jwt = JWT.decode(token);
+    } catch (JWTDecodeException exception){
+      //Invalid token
+    }
     //Method for deleting the user
-    boolean successfulUserDeleted = UserController.delete(id);
-
-
+    boolean successfulUserDeleted = UserController.delete(jwt.getClaim("userId").asInt());
 
     // Updates the cache
     userCache.getUsers(true);
 
     if (successfulUserDeleted){
       // Return a response with status 200 and JSON as type
-      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("Deleted the user with id " + id).build();
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("Deleted the user with id ").build();
     }
     return Response.status(400).entity("There was a problem deleting the user").build();
   }

@@ -127,8 +127,10 @@ public class UserEndpoints {
     } catch (JWTDecodeException exception){
       //Invalid token
     }
+
+    User userToDelete = new Gson().fromJson(jwt.getClaim("userJson").asString(), User.class);
     //Method for deleting the user
-    boolean successfulUserDeleted = UserController.delete(jwt.getClaim("userId").asInt());
+    boolean successfulUserDeleted = UserController.delete(userToDelete.getId());
 
     // Updates the cache
     userCache.getUsers(true);
@@ -141,7 +143,24 @@ public class UserEndpoints {
   }
 
   // TODO: Make the system able to update users
-  public Response updateUser(String x) {
+  @POST
+  @Path("/update/")
+  public Response updateUser(String infoAndToken) {
+
+    User userInfo = new Gson().fromJson(infoAndToken, User.class);
+
+    DecodedJWT jwt = null;
+    try {
+      jwt = JWT.decode(userInfo.getToken());
+    } catch (JWTDecodeException e){
+      //Invalid token
+    }
+
+    User userToChange = new Gson().fromJson(jwt.getClaim("userJson").asString(), User.class);
+
+    UserController.updateUser(userInfo, userToChange);
+
+    userCache.getUsers(true);
 
     // Return a response with status 200 and JSON as type
     return Response.status(400).entity("Endpoint not implemented yet").build();

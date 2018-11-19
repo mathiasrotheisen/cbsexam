@@ -217,7 +217,7 @@ public class UserController {
       userToUpdate.setLastname(userInfo.getLastname());
 
     if (userInfo.getPassword() != null)
-      userToUpdate.setPassword(userInfo.getPassword());
+      userToUpdate.setPassword(Hashing.shaWithSalt(userInfo.getPassword()));
 
     if (userInfo.getEmail() != null)
       userToUpdate.setEmail(userInfo.getEmail());
@@ -231,8 +231,5 @@ public class UserController {
     dbCon.deleteUpdate(sql);
 
     return true;
-
-
-
   }
 }

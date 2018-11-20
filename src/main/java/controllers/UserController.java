@@ -203,7 +203,7 @@ public class UserController {
     return user;
   }
 
-  public static boolean updateUser(User userInfo, User userToUpdate) {
+  public static User updateUser(User userInfo, User userToUpdate) {
 
 
     if (dbCon == null) {
@@ -228,8 +228,14 @@ public class UserController {
             "', email = '" + userToUpdate.getEmail() +
             "' WHERE id = " + userToUpdate.getId();
 
-    dbCon.deleteUpdate(sql);
+    String json = new Gson().toJson(userToUpdate);
+    Algorithm algorithm = Algorithm.HMAC256("cbsexam");
+    String token = JWT.create().withClaim("userJson", json).sign(algorithm);
+    userToUpdate.setToken(token);
 
-    return true;
+    if (dbCon.deleteUpdate(sql)) {
+      return userToUpdate;
+    }
+    return null;
   }
 }

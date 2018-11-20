@@ -94,7 +94,7 @@ public class UserEndpoints {
     }
   }
 
-  // TODO: Make the system able to login users and assign them a token to use throughout the system.
+  // TODO: Make the system able to login users and assign them a token to use throughout the system. FIXED
   @POST
   @Path("/login")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -142,7 +142,7 @@ public class UserEndpoints {
     return Response.status(400).entity("There was a problem deleting the user").build();
   }
 
-  // TODO: Make the system able to update users
+  // TODO: Make the system able to update users FIXED
   @POST
   @Path("/update/")
   public Response updateUser(String infoAndToken) {
@@ -158,10 +158,14 @@ public class UserEndpoints {
 
     User userToChange = new Gson().fromJson(jwt.getClaim("userJson").asString(), User.class);
 
-    UserController.updateUser(userInfo, userToChange);
+    User updatedUser = UserController.updateUser(userInfo, userToChange);
+    String json = new Gson().toJson(updatedUser);
 
     userCache.getUsers(true);
 
+    if (updatedUser != null) {
+      return Response.status(200).entity("Your new information and token is " + json).build();
+    }
     // Return a response with status 200 and JSON as type
     return Response.status(400).entity("Endpoint not implemented yet").build();
   }

@@ -42,7 +42,7 @@ public class OrderController {
         Address billingAddress = AddressController.getAddress(rs.getInt("billing_address_id"));
         Address shippingAddress = AddressController.getAddress(rs.getInt("shipping_address_id"));
 
-        // Create an object instance of order from the database dataa
+        // Create an object instance of order from the database data
         order =
             new Order(
                 rs.getInt("id"),
@@ -191,9 +191,6 @@ public class OrderController {
         e.printStackTrace();
       }
     }
-
-
-
     // Return order
     return order;
   }

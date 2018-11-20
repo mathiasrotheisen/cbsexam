@@ -121,23 +121,15 @@ public class UserEndpoints {
   // TODO: Make the system able to delete users: FIXED
   public Response deleteUser(String token) {
 
-    DecodedJWT jwt = null;
-    try {
-      jwt = JWT.decode(token);
-    } catch (JWTDecodeException exception){
-      //Invalid token
-    }
-
-    User userToDelete = new Gson().fromJson(jwt.getClaim("userJson").asString(), User.class);
     //Method for deleting the user
-    boolean successfulUserDeleted = UserController.delete(userToDelete.getId());
+    boolean successfulUserDeleted = UserController.delete(token);
 
     // Updates the cache
     userCache.getUsers(true);
 
     if (successfulUserDeleted){
       // Return a response with status 200 and JSON as type
-      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("Deleted the user with id ").build();
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("Deleted the user").build();
     }
     return Response.status(400).entity("There was a problem deleting the user").build();
   }
@@ -149,16 +141,7 @@ public class UserEndpoints {
 
     User userInfo = new Gson().fromJson(infoAndToken, User.class);
 
-    DecodedJWT jwt = null;
-    try {
-      jwt = JWT.decode(userInfo.getToken());
-    } catch (JWTDecodeException e){
-      //Invalid token
-    }
-
-    User userToChange = new Gson().fromJson(jwt.getClaim("userJson").asString(), User.class);
-
-    User updatedUser = UserController.updateUser(userInfo, userToChange);
+    User updatedUser = UserController.updateUser(userInfo);
     String json = new Gson().toJson(updatedUser);
 
     userCache.getUsers(true);
@@ -167,6 +150,6 @@ public class UserEndpoints {
       return Response.status(200).entity("Your new information and token is " + json).build();
     }
     // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+    return Response.status(400).entity("The updated user was not found").build();
   }
 }

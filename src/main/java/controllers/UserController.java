@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.gson.Gson;
 import model.User;
 import utils.Hashing;
@@ -38,13 +40,13 @@ public class UserController {
       // Get first object, since we only have one
       if (rs.next()) {
         user =
-            new User(
-                rs.getInt("id"),
-                rs.getString("first_name"),
-                rs.getString("last_name"),
-                rs.getString("password"),
-                rs.getString("email"),
-                rs.getLong("created_at"));
+                new User(
+                        rs.getInt("id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("password"),
+                        rs.getString("email"),
+                        rs.getLong("created_at"));
 
         // return the create object
         return user;
@@ -82,13 +84,13 @@ public class UserController {
       // Loop through DB Data
       while (rs.next()) {
         User user =
-            new User(
-                rs.getInt("id"),
-                rs.getString("first_name"),
-                rs.getString("last_name"),
-                rs.getString("password"),
-                rs.getString("email"),
-                rs.getLong("created_at"));
+                new User(
+                        rs.getInt("id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("password"),
+                        rs.getString("email"),
+                        rs.getLong("created_at"));
 
         // Add element to list
         users.add(user);
@@ -117,22 +119,22 @@ public class UserController {
     // Insert the user in the DB
     // TODO: Hash the user password before saving it : FIXED
     int userID = dbCon.insert(
-        "INSERT INTO user(first_name, last_name, password, email, created_at) VALUES('"
-            + user.getFirstname()
-            + "', '"
-            + user.getLastname()
-            + "', '"
-            + Hashing.shaWithSalt(user.getPassword())
-            + "', '"
-            + user.getEmail()
-            + "', "
-            + user.getCreatedTime()
-            + ")");
+            "INSERT INTO user(first_name, last_name, password, email, created_at) VALUES('"
+                    + user.getFirstname()
+                    + "', '"
+                    + user.getLastname()
+                    + "', '"
+                    + Hashing.shaWithSalt(user.getPassword())
+                    + "', '"
+                    + user.getEmail()
+                    + "', "
+                    + user.getCreatedTime()
+                    + ")");
 
     if (userID != 0) {
       //Update the userid of the user before returning
       user.setId(userID);
-    } else{
+    } else {
       // Return null if user has not been inserted into database
       return null;
     }
@@ -141,7 +143,17 @@ public class UserController {
     return user;
   }
 
-  public static boolean delete(int id) {
+  public static boolean delete(String token) {
+
+    DecodedJWT jwt = null;
+    try {
+      jwt = JWT.decode(token);
+    } catch (JWTDecodeException exception) {
+      //Invalid token
+    }
+
+    int id = jwt.getClaim("userID").asInt();
+
     Log.writeLog(UserController.class.getName(), id, "deleting a user in the Database", 0);
 
     if (dbCon == null) {
@@ -175,20 +187,18 @@ public class UserController {
       if (rs.next()) {
 
 
-
-          user = new User(
-                        rs.getInt("id"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("password"),
-                        rs.getString("email"),
-                        rs.getLong("created_at"));
+        user = new User(
+                rs.getInt("id"),
+                rs.getString("first_name"),
+                rs.getString("last_name"),
+                rs.getString("password"),
+                rs.getString("email"),
+                rs.getLong("created_at"));
         // return the create object
 
 
-        String json = new Gson().toJson(user);
         Algorithm algorithm = Algorithm.HMAC256("cbsexam");
-        String token = JWT.create().withClaim("userJson", json).sign(algorithm);
+        String token = JWT.create().withClaim("userID", user.getId()).withClaim("exp", 3600).sign(algorithm);
         user.setToken(token);
 
         return user;
@@ -203,12 +213,22 @@ public class UserController {
     return user;
   }
 
-  public static User updateUser(User userInfo, User userToUpdate) {
-
+  public static User updateUser(User userInfo) {
 
     if (dbCon == null) {
       dbCon = new DatabaseController();
     }
+
+    DecodedJWT jwt = null;
+    try {
+      jwt = JWT.decode(userInfo.getToken());
+    } catch (JWTDecodeException exception) {
+      //Invalid token
+    }
+
+    int id = jwt.getClaim("userID").asInt();
+
+    User userToUpdate = getUser(id);
 
     if (userInfo.getFirstname() != null)
       userToUpdate.setFirstname(userInfo.getFirstname());
@@ -228,14 +248,11 @@ public class UserController {
             "', email = '" + userToUpdate.getEmail() +
             "' WHERE id = " + userToUpdate.getId();
 
-    String json = new Gson().toJson(userToUpdate);
-    Algorithm algorithm = Algorithm.HMAC256("cbsexam");
-    String token = JWT.create().withClaim("userJson", json).sign(algorithm);
-    userToUpdate.setToken(token);
 
     if (dbCon.deleteUpdate(sql)) {
       return userToUpdate;
     }
     return null;
   }
+
 }

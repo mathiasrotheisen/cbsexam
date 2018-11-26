@@ -39,12 +39,12 @@ public class ProductController {
                 rs.getFloat("price"),
                 rs.getString("description"),
                 rs.getInt("stock"),
-                rs.getLong("creaeted_at"));
+                rs.getLong("created_at"));
 
         // Return the product
         return product;
       } else {
-        System.out.println("No user found");
+        System.out.println("No User found");
       }
     } catch (SQLException ex) {
       System.out.println(ex.getMessage());

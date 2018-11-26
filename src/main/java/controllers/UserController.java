@@ -149,7 +149,8 @@ public class UserController {
     try {
       jwt = JWT.decode(token);
     } catch (JWTDecodeException exception) {
-      //Invalid token
+      System.out.println(exception.getMessage());
+      System.out.println(exception.getStackTrace());
     }
 
     int id = jwt.getClaim("userID").asInt();
@@ -223,7 +224,8 @@ public class UserController {
     try {
       jwt = JWT.decode(userInfo.getToken());
     } catch (JWTDecodeException exception) {
-      //Invalid token
+      System.out.println(exception.getMessage());
+      System.out.println(exception.getStackTrace());
     }
 
     int id = jwt.getClaim("userID").asInt();

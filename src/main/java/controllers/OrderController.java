@@ -27,7 +27,14 @@ public class OrderController {
     }
 
     // Build SQL string to query
-    String sql = "SELECT * FROM orders where id=" + id;
+    String sql = "SELECT *, billing.street_address as billing, shipping.street_address as shipping\n" +
+            "FROM orders \n" +
+            "JOIN user on orders.user_id = user.id\n" +
+            "LEFT JOIN address as billing\n" +
+            "ON orders.billing_address_id = billing.id\n" +
+            "LEFT JOIN address as shipping\n" +
+            "ON orders.shipping_address_id = shipping.id\n" +
+            "WHERE orders.id = " + id;
 
     // Do the query in the database and create an empty object for the results
     ResultSet rs = dbCon.query(sql);
@@ -37,11 +44,35 @@ public class OrderController {
       if (rs.next()) {
 
         // Perhaps we could optimize things a bit here and get rid of nested queries.
-        User user = UserController.getUser(rs.getInt("user_id"));
+//        User user = UserController.getUser(rs.getInt("user_id"));
         ArrayList<LineItem> lineItems = LineItemController.getLineItemsForOrder(rs.getInt("id"));
-        Address billingAddress = AddressController.getAddress(rs.getInt("billing_address_id"));
-        Address shippingAddress = AddressController.getAddress(rs.getInt("shipping_address_id"));
+//        Address billingAddress = AddressController.getAddress(rs.getInt("billing_address_id"));
+//        Address shippingAddress = AddressController.getAddress(rs.getInt("shipping_address_id"));
 
+        // Create an order from the database data
+
+        User user = new User(
+                rs.getInt("user_id"),
+                rs.getString("first_name"),
+                rs.getString("last_name"),
+                rs.getString("password"),
+                rs.getString("email"),
+                rs.getLong("created_at"));
+
+        Address billingAddress = new Address(
+                rs.getInt("billing_address_id"),
+                rs.getString("name"),
+                rs.getString("billing"),
+                rs.getString("city"),
+                rs.getString("zipcode"));
+
+        Address shippingAddress = new Address(
+                rs.getInt("shipping_address_id"),
+                rs.getString("name"),
+                rs.getString("shipping"),
+                rs.getString("city"),
+                rs.getString("zipcode")
+        );
         // Create an object instance of order from the database data
         order =
             new Order(
@@ -78,7 +109,13 @@ public class OrderController {
       dbCon = new DatabaseController();
     }
 
-    String sql = "SELECT * FROM orders";
+    String sql = "SELECT *, billing.street_address as billing, shipping.street_address as shipping\n" +
+            "FROM orders \n" +
+            "JOIN user on orders.user_id = user.id\n" +
+            "LEFT JOIN address as billing\n" +
+            "ON orders.billing_address_id = billing.id\n" +
+            "LEFT JOIN address as shipping\n" +
+            "ON orders.shipping_address_id = shipping.id";
 
     ResultSet rs = dbCon.query(sql);
     ArrayList<Order> orders = new ArrayList<Order>();
@@ -87,12 +124,36 @@ public class OrderController {
       while(rs.next()) {
 
         // Perhaps we could optimize things a bit here and get rid of nested queries.
-        User user = UserController.getUser(rs.getInt("user_id"));
+//        User user = UserController.getUser(rs.getInt("user_id"));
         ArrayList<LineItem> lineItems = LineItemController.getLineItemsForOrder(rs.getInt("id"));
-        Address billingAddress = AddressController.getAddress(rs.getInt("billing_address_id"));
-        Address shippingAddress = AddressController.getAddress(rs.getInt("shipping_address_id"));
+//        Address billingAddress = AddressController.getAddress(rs.getInt("billing_address_id"));
+//        Address shippingAddress = AddressController.getAddress(rs.getInt("shipping_address_id"));
 
         // Create an order from the database data
+
+        User user = new User(
+                rs.getInt("user_id"),
+                rs.getString("first_name"),
+                rs.getString("last_name"),
+                rs.getString("password"),
+                rs.getString("email"),
+                rs.getLong("created_at"));
+
+        Address billingAddress = new Address(
+                rs.getInt("billing_address_id"),
+                rs.getString("name"),
+                rs.getString("billing"),
+                rs.getString("city"),
+                rs.getString("zipcode"));
+
+        Address shippingAddress = new Address(
+                rs.getInt("shipping_address_id"),
+                rs.getString("name"),
+                rs.getString("shipping"),
+                rs.getString("city"),
+                rs.getString("zipcode")
+        );
+
         Order order =
             new Order(
                 rs.getInt("id"),

@@ -147,7 +147,7 @@ public class UserEndpoints {
     userCache.getUsers(true);
 
     if (updatedUser != null) {
-      return Response.status(200).entity("Your new information and token is " + json).build();
+      return Response.status(200).entity("Your new information" + json).build();
     }
     // Return a response with status 200 and JSON as type
     return Response.status(400).entity("The updated user was not found").build();

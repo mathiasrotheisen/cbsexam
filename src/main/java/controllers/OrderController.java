@@ -15,6 +15,7 @@ public class OrderController {
 
   private static DatabaseController dbCon;
 
+
   public OrderController() {
     dbCon = new DatabaseController();
   }
@@ -124,13 +125,10 @@ public class OrderController {
       while(rs.next()) {
 
         // Perhaps we could optimize things a bit here and get rid of nested queries.
-//        User user = UserController.getUser(rs.getInt("user_id"));
         ArrayList<LineItem> lineItems = LineItemController.getLineItemsForOrder(rs.getInt("id"));
-//        Address billingAddress = AddressController.getAddress(rs.getInt("billing_address_id"));
-//        Address shippingAddress = AddressController.getAddress(rs.getInt("shipping_address_id"));
+
 
         // Create an order from the database data
-
         User user = new User(
                 rs.getInt("user_id"),
                 rs.getString("first_name"),

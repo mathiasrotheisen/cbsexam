@@ -70,6 +70,8 @@ public class OrderEndpoints {
     // Use the controller to add the user
     Order createdOrder = OrderController.createOrder(newOrder);
 
+    orderCache.getOrders(true);
+
     // Get the user back with the added ID and return it to the user
     String json = new Gson().toJson(createdOrder);
 

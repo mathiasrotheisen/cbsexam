@@ -108,11 +108,11 @@ public class UserEndpoints {
 
     // && Hashing.shaWithSalt(loginUser.getPassword()).equals(databaseUser.getPassword())
 
-    if (loginUser.getEmail().equals(databaseUser.getEmail()) ) {
+    if (loginUser.getEmail().equals(databaseUser.getEmail()) && Hashing.shaWithSalt(loginUser.getPassword()).equals(databaseUser.getPassword())) {
       // Return a response with status 200 and JSON as type
       return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
     }
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+    return Response.status(400).entity("Could not login user. Check password / email").build();
 
   }
 
@@ -150,6 +150,6 @@ public class UserEndpoints {
       return Response.status(200).entity("Your new information" + json).build();
     }
     // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("The updated user was not found").build();
+    return Response.status(400).entity("The user to update was not found").build();
   }
 }

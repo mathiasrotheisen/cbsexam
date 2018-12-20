@@ -199,7 +199,7 @@ public class UserController {
 
 
         Algorithm algorithm = Algorithm.HMAC256("cbsexam");
-        String token = JWT.create().withClaim("userID", user.getId()).withClaim("exp", 3600).sign(algorithm);
+        String token = JWT.create().withClaim("userID", user.getId()).sign(algorithm);
         user.setToken(token);
 
         return user;
